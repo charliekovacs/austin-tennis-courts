@@ -1,5 +1,6 @@
 var map;
 var openedInfoWindow = null;
+var currentMarker = null;
 
 // create the map
 function initMap() {
@@ -17,9 +18,6 @@ function initMap() {
   google.maps.event.addListener(map, 'click', function(event) {
     placeMarker(event.latLng);
   });
-
-
-
 }
 
 // drop in the pre-existing markers
@@ -51,13 +49,17 @@ window.feedCallback = function(results) {
 // create new markers (when user clicks on map)
 function placeMarker(location) {
 
-  var marker = new google.maps.Marker({
+  if (currentMarker != null) marker.setMap(null);
+
+  marker = new google.maps.Marker({
     position: location,
     map: map,
     draggable: true,
     optimized: false,
     content: '<div id="form"><table><tr><td>Notes:</td><td><input type="text" id="notes"/></td></tr><tr><td><input type="button" value="Submit" onclick="saveData(document.getElementById(\'notes\').value)"/></td></tr></table></div>'
   });
+
+  currentMarker = marker;
 
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
 
@@ -83,7 +85,23 @@ function deleteMarker(marker) {
 }
 
 function saveData(notes) {
-  alert(notes);
+  alert(currentMarker.position);
   openedInfoWindow.close();
   openedInfoWindow = null;
+
+  var date = new Date();
+  var userSubmission = date + '~' + currentMarker.position + '~' + notes;
+
+  // save input data here to a txt file via php
+$(document).ready(function() {
+  $.ajax ({
+    type: "POST",
+    url: "http://charliekovacs.com/tennis/tennis.php",
+    data: userSubmission,
+    success: function() {
+      alert('Thanks! We got your submission, we will take a look at adding it to the map');
+    }
+  });
+})
+
 }
