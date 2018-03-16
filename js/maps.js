@@ -85,7 +85,6 @@ function deleteMarker(marker) {
 }
 
 function saveData(notes) {
-  alert(currentMarker.position);
   openedInfoWindow.close();
   openedInfoWindow = null;
 
